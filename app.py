@@ -112,6 +112,25 @@ features_df['cluster'] = kmeans_clusters
 st.sidebar.header("Navigation")
 selected_tab = st.sidebar.radio("Aller à", ["Aperçu Général", "Analyse des Clusters", "Prédiction d'Engagement", "Recommandations"])
 
+# Recommandations spécifiques par cluster
+recommandations = {
+    0: "Relance ciblée via email avec mise en avant de fonctionnalités \"en un clic\". "
+       "Suppression de frictions : tutoriel simple ou onboarding ultra light. "
+       "Campagnes d’activation avec récompense à la première action.",
+    1: "Relancer avec du contenu personnalisé ou recommandations basées sur leurs usages. "
+       "Emails “Vous aimerez aussi…” basés sur les premières actions effectuées. "
+       "Créer un parcours d’engagement progressif (avec jalons visibles).",
+    2: "Mettre en avant des contenus plus experts ou des outils avancés. "
+       "Proposer une implication communautaire : tutoriels, retours, sondages. "
+       "Cibler avec des relances pour les faire passer au niveau “super”.",
+    3: "Valorisation de leur fidélité (badges, classements). "
+       "Invitations à participer à des tests utilisateurs ou sondages. "
+       "Contenus plus approfondis adaptés à leur usage avancé.",
+    4: "Intégration au programme ambassadeur ou mentorat. "
+       "Accès prioritaire aux nouveautés. "
+       "Sollicitations pour co-créer des contenus ou animer la communauté."
+}
+
 # --- Onglet Aperçu Général ---
 if selected_tab == "Aperçu Général":
     st.subheader("Statistiques Générales")
@@ -221,7 +240,6 @@ elif selected_tab == "Prédiction d'Engagement":
             predicted_engagement = model.predict(new_user_scaled)[0]
             predicted_class = round(predicted_engagement)
             st.write(f"La classe d'engagement prédite pour ce nouvel utilisateur est : **{predicted_class}**")
-
 # --- Onglet Recommandations Basées sur les Clusters ---
 elif selected_tab == "Recommandations":
     st.sidebar.header("Recommandations")
@@ -247,14 +265,21 @@ elif selected_tab == "Recommandations":
 
             st.write("Actions sous-représentées dans ce cluster :")
             st.write(negative_deviations[negative_deviations < 0])
+            
+            st.subheader("Recommandation Stratégique pour ce Cluster")
+            if selected_cluster in recommandations:
+                st.success(recommandations[selected_cluster])
+            else:
+                st.info("Aucune recommandation spécifique définie pour ce cluster.")
 
-            st.info("Recommandations potentielles pour ce cluster :")
-            if positive_deviations.any():
-                top_positive_actions = positive_deviations[positive_deviations > 0].index.tolist()
-                st.write(f"- Mettre en avant davantage les contenus/fonctionnalités liés à : **{', '.join(top_positive_actions)}** pour maintenir l'engagement.")
-            if negative_deviations.any():
-                top_negative_actions = negative_deviations[negative_deviations < 0].index.tolist()
-                st.write(f"- Explorer des stratégies pour encourager davantage d'interactions avec : **{', '.join(top_negative_actions)}**.")
+
+#            st.info("Recommandations potentielles pour ce cluster :")
+#            if positive_deviations.any():
+#                top_positive_actions = positive_deviations[positive_deviations > 0].index.tolist()
+#               st.write(f"- Mettre en avant davantage les contenus/fonctionnalités liés à : **{', '.join(top_positive_actions)}** pour maintenir l'engagement.")
+#            if negative_deviations.any():
+#                top_negative_actions = negative_deviations[negative_deviations < 0].index.tolist()
+#                st.write(f"- Explorer des stratégies pour encourager davantage d'interactions avec : **{', '.join(top_negative_actions)}**.")
 
         else:
             st.warning("Aucun utilisateur trouvé dans ce cluster.")
